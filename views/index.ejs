@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta content="text/html; charset=UTF-8">
+        <script >
+              function setQuiz() {
+                location.href = "/quiz";
+            }
+
+        </script>
+    </head>
+    <body>
+        <header>
+            <h1>ホーム画面</h1>
+        </header>
+        <div>
+            <h1 id="title">ようこそ</h1>
+            <p id="genre"></p>
+            <p id="difficulty"></p>
+            <p id="question">以下のボタンをクリック</p>
+            <button id="start-button">開始</button>
+          </div>
+          <div id="answers"></div>
+          <script type="module" src="/main.js"></script>
+    </body>
+</html>

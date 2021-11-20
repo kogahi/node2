@@ -1,17 +1,21 @@
 const express = require('express');
+const app = express();
+const Views = '../views/'
 const http = require('http');
 const fs = require('fs');
+const Quiz = require('../models/quizModel');
 
 module.exports = {
-  doRequest: (req, res) => {
-    var server = http.createServer(
-      (request,response)=>{
-          fs.readFile('../index.html','UTF-8',(error,data)=>{
-              response.writeHead(200, {'Content-Type':'text/html'});
-              response.write(data);
-              response.end();
-          })
-      });
-  server.listen(3000);
-  },
-}
+    index: (req, res) => {
+      res.render('index');
+    },
+    getQuiz: async (req ,res) => {
+      try{
+         const quizData = await Quiz.getQuiz();
+         return res.json(quizData)
+      } catch(err) {
+        console.log(err)
+      }
+
+    }
+  }

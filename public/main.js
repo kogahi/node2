@@ -1,8 +1,6 @@
-const URL = "https://opentdb.com/api.php?amount=10";
-
 class Quiz {
   constructor(quizData) {
-    this._quizzes = quizData.results;
+    this._quizzes = quizData;
     this._correctAnswersNum = 0;
   }
   getQuizCategory(index) {
@@ -11,12 +9,14 @@ class Quiz {
   getQuizDifficulty(index) {
     return this._quizzes[index - 1].difficulty;
   }
+  //クイズの長さを取得するためのgetNumQuizメソッド
   getNumOfQuiz() {
     return this._quizzes.length;
   }
   getQuizQuestion(index) {
     return this._quizzes[index - 1].question;
   }
+  //クイズの正答を取得するためのgetCorrectAnswerメソッド
   getCorrectAnswer(index) {
     return this._quizzes[index - 1].correct_answer;
   }
@@ -29,11 +29,11 @@ class Quiz {
       return this._correctAnswersNum++;
     }
   }
+  //カウントした正答数を取得するためのgetCorrectAnswersNumメソッド
   getCorrectAnswerNum() {
     return this._correctAnswersNum;
   }
 }
-
 const titleElement = document.getElementById("title");
 const questionElement = document.getElementById("question");
 const answersContainer = document.getElementById("answers");
@@ -48,10 +48,10 @@ startButton.addEventListener("click", () => {
 const fetchQuiz = async (index) => {
   titleElement.textContent = "取得中";
   questionElement.textContent = "お待ち下さい";
-
-  const res = await fetch(URL);
-  const quizData = await res.json();
-  const quizInstance = new Quiz(quizData);
+  const quizData = await fetch('/quiz');
+  const quizRow = await quizData.json();
+  console.log(quizRow)
+  const quizInstance = new Quiz(quizRow);
   setNextQuiz(quizInstance, index);
 };
 
@@ -84,6 +84,7 @@ const shuffleArray = (array) => {
   return copiedArray;
 };
 const makeQuiz = (quizInstance, index) => {
+  console.log(index)
   titleElement.innerHTML = `問題${index}`;
   genreElement.innerHTML = `【ジャンル】 ${quizInstance.getQuizCategory(
     index
@@ -94,14 +95,17 @@ const makeQuiz = (quizInstance, index) => {
   questionElement.innerHTML = `【クイズ】${quizInstance.getQuizQuestion(
     index
   )}`;
+  //answerを定義
   const answers = buildAnswers(quizInstance, index);
 
   answers.forEach((answer) => {
     const answerElement = document.createElement("li");
     answersContainer.appendChild(answerElement);
+    //ボタンのテキストに答えを表示
     const buttonElement = document.createElement("button");
     buttonElement.innerHTML = answer;
     answersContainer.appendChild(buttonElement);
+    //正答数をカウントするインスタンスメソッドを定義
     buttonElement.addEventListener("click", () => {
       quizInstance.countCorrectAnswersNum(index, answer);
       index++;
@@ -111,9 +115,12 @@ const makeQuiz = (quizInstance, index) => {
 };
 
 const finishQuiz = (quizInstance) => {
+  //カウントした正答数を表示
   titleElement.textContent = `あなたの正答数は${quizInstance.getCorrectAnswerNum()}です`;
+  //ジャンルや難易度の項目を空白にする
   genreElement.textContent = "";
   difficultyElement.textContent = "";
+  //再チャレンジ用の文面を用意
   questionElement.textContent = "再チャレンジしたい場合は下をクリック"; //クイズが終わった後にもう一度スタート画面に戻れるようにする
   const restartButton = document.createElement("button");
   restartButton.textContent = "ホームに戻る";
