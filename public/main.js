@@ -1,39 +1,5 @@
-class Quiz {
-  constructor(quizData) {
-    this._quizzes = quizData;
-    this._correctAnswersNum = 0;
-  }
-  getQuizCategory(index) {
-    return this._quizzes[index - 1].category;
-  }
-  getQuizDifficulty(index) {
-    return this._quizzes[index - 1].difficulty;
-  }
-  //クイズの長さを取得するためのgetNumQuizメソッド
-  getNumOfQuiz() {
-    return this._quizzes.length;
-  }
-  getQuizQuestion(index) {
-    return this._quizzes[index - 1].question;
-  }
-  //クイズの正答を取得するためのgetCorrectAnswerメソッド
-  getCorrectAnswer(index) {
-    return this._quizzes[index - 1].correct_answer;
-  }
-  getIncorrerctAnswers(index) {
-    return this._quizzes[index - 1].incorrect_answers;
-  }
-  countCorrectAnswersNum(index, answer) {
-    const correctAnswer = this._quizzes[index - 1].correct_answer;
-    if (answer === correctAnswer) {
-      return this._correctAnswersNum++;
-    }
-  }
-  //カウントした正答数を取得するためのgetCorrectAnswersNumメソッド
-  getCorrectAnswerNum() {
-    return this._correctAnswersNum;
-  }
-}
+import {Quiz} from './main_class.js';
+
 const titleElement = document.getElementById("title");
 const questionElement = document.getElementById("question");
 const answersContainer = document.getElementById("answers");
@@ -46,13 +12,17 @@ startButton.addEventListener("click", () => {
 });
 
 const fetchQuiz = async (index) => {
-  titleElement.textContent = "取得中";
-  questionElement.textContent = "お待ち下さい";
-  const quizData = await fetch('/quiz');
-  const quizRow = await quizData.json();
-  console.log(quizRow)
-  const quizInstance = new Quiz(quizRow);
-  setNextQuiz(quizInstance, index);
+  try {
+    titleElement.textContent = "取得中";
+    questionElement.textContent = "お待ち下さい";
+    const quizData = await fetch('/quiz');
+    const quizRow = await quizData.json();
+    const quizInstance = new Quiz(quizRow);
+    setNextQuiz(quizInstance, index);
+  }catch(err) {
+    console.log(err);
+  }
+
 };
 
 const setNextQuiz = (quizInstance, index) => {
@@ -66,25 +36,7 @@ const setNextQuiz = (quizInstance, index) => {
   }
 };
 
-const buildAnswers = (quizInstance, index) => {
-  const answers = [
-    quizInstance.getCorrectAnswer(index),
-    ...quizInstance.getIncorrerctAnswers(index),
-  ];
-  return shuffleArray(answers);
-};
-
-const shuffleArray = (array) => {
-  const copiedArray = array.slice();
-  for (let i = copiedArray.length - 1; i >= 0; i--) {
-    const rand = Math.floor(Math.random() * (i + 1));
-    [copiedArray[i], copiedArray[rand]] = [copiedArray[rand], copiedArray[i]];
-  }
-
-  return copiedArray;
-};
 const makeQuiz = (quizInstance, index) => {
-  console.log(index)
   titleElement.innerHTML = `問題${index}`;
   genreElement.innerHTML = `【ジャンル】 ${quizInstance.getQuizCategory(
     index
@@ -96,8 +48,7 @@ const makeQuiz = (quizInstance, index) => {
     index
   )}`;
   //answerを定義
-  const answers = buildAnswers(quizInstance, index);
-
+  const answers = quizInstance.getShuffledAnswers(index);
   answers.forEach((answer) => {
     const answerElement = document.createElement("li");
     answersContainer.appendChild(answerElement);
