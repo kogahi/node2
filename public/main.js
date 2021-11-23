@@ -12,9 +12,9 @@ startButton.addEventListener("click", () => {
 });
 
 const fetchQuiz = async (index) => {
+  titleElement.textContent = "取得中";
+  questionElement.textContent = "お待ち下さい";
   try {
-    titleElement.textContent = "取得中";
-    questionElement.textContent = "お待ち下さい";
     const quizData = await fetch('/quiz');
     const quizRow = await quizData.json();
     const quizInstance = new Quiz(quizRow);
